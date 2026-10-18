@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const rawUrl = import.meta.env.VITE_SUPABASE_URL;
+const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const url = typeof rawUrl === 'string'
+  ? rawUrl.trim().replace(/\/rest\/v1\/?$/, '')
+  : '';
+const key = typeof rawKey === 'string' ? rawKey.trim() : '';
 
 export const BUCKET = 'wedding-ar';
 export const configError =
@@ -14,7 +18,9 @@ export const supabase = configError
   ? null
   : createClient(url, key, {
       auth: { persistSession: false, autoRefreshToken: false },
-      global: { fetch: (u, o) => fetch(u, { ...o, cache: 'no-store' }) },
+      global: {
+        fetch: (u, o = {}) => fetch(u, { ...o, cache: 'no-store' }),
+      },
     });
 
 export const publicUrl = (path) => supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
