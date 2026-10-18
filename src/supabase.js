@@ -3,9 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 const rawUrl = import.meta.env.VITE_SUPABASE_URL;
 const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const url = typeof rawUrl === 'string'
-  ? rawUrl.trim().replace(/\/rest\/v1\/?$/, '')
+  ? rawUrl.trim().replace(/^['"]|['"]$/g, '').replace(/\/rest\/v1\/?$/, '')
   : '';
-const key = typeof rawKey === 'string' ? rawKey.trim() : '';
+const key = typeof rawKey === 'string'
+  ? rawKey.trim().replace(/^['"]|['"]$/g, '').replace(/\s/g, '')
+  : '';
 
 export const BUCKET = 'wedding-ar';
 export const configError =
